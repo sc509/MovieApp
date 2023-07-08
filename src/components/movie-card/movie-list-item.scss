@@ -1,0 +1,53 @@
+$text-color: rgba(130, 126, 126, 1);
+$button-text-color:rgba(0, 0, 0, 0.65);
+$gradient-colors: (#D9D9D9, #FAFAFA);
+$border-color:rgba(217, 217, 217, 1);
+$description-color:rgba(0, 0, 0, 1);
+
+.movie-list__item {
+    display: grid;
+    grid-template-columns: 45% 55%;
+    justify-content: center;
+    width: 454px;
+    height: 281px;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+    &-image{
+        width: 183px;
+        height: 281px;
+    }
+    &-title{
+        margin-bottom: 7px;
+        line-height: 28px;
+        font-size: 20px;
+
+    }
+    &-date{
+        margin-bottom: 7px;
+        color: $text-color;
+        font-size: 12px;
+        line-height: 22px;
+    }
+    &-button{
+        min-width: 46px;
+        height: 20px;
+        font-size: 12px;
+        line-height: 14.52px;
+        border: 1px solid $border-color;;
+        border-radius: 2px;
+        background: rgba(250, 250, 250, 1);
+        color: $button-text-color;
+        margin-right: 8px;
+        padding: 2px 5px 3px 5px;
+        margin-bottom: 10px;
+    }
+    &-description{
+        font-size: 12px;
+        line-height: 22px;
+        font-weight: 400;
+        color: $description-color;
+        height: 129px;
+        width: 228px;
+    }
+}
+
