@@ -15,10 +15,12 @@ export default class App extends Component {
         loading: true,
         error: false,
         isOnline: window.navigator.onLine,
+        currentPage: 1,
+        totalResults: 0,
     };
 
     componentDidMount() {
-        this.handleSearch('');
+        this.handleSearch('', this.state.currentPage);
         window.addEventListener('online', this.updateOnlineStatus);
         window.addEventListener('offline', this.updateOnlineStatus);
     }
@@ -32,16 +34,21 @@ export default class App extends Component {
         this.setState({ isOnline: window.navigator.onLine });
     };
 
-    handleSearch = debounce(async (text) => {
+    handleSearch = debounce(async (text, currentPage) => {
         try {
             this.setState({ loading: true });
-            const movies = await this.mdbapiService.getMoviesBySearch(text);
-            this.setState({ movies, loading: false, error: false });
+            const response = await this.mdbapiService.getMoviesBySearch(text, currentPage);
+            this.setState({ movies: response.results, totalResults: response.total_results, loading: false, error: false });
         } catch (error) {
             console.error('Ошибка при получении фильмов:', error);
             this.setState({ error: true, loading: false });
         }
     }, 800);
+
+    handlePageChange = (page) => {
+        this.setState({ currentPage: page });
+        this.handleSearch('', page);
+    };
     render() {
         const { isOnline, movies, loading, error } = this.state;
         const spinElement = loading ? (
@@ -63,7 +70,7 @@ export default class App extends Component {
                             {noResultsMessage}
                             <MovieList movies={movies} loading={loading} error={error} />
                         </section>
-                        <Footer />
+                        <Footer currentPage={this.state.currentPage} handlePageChange={this.handlePageChange} totalResults={this.state.totalResults} />
                     </section>
                 ) : (
                     <div>

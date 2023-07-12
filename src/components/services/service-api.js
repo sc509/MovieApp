@@ -18,18 +18,18 @@ export default class MdbapiService {
         return await res.json();
     }
 
-    async getTrendingMovies() {
-        const url = `${this.apiUrl}/trending/all/day?language=en-US`;
-        const res = await this.getResource(url);
-        return res.results;
+    async getTrendingMovies(page = 1) {
+        const url = `${this.apiUrl}/trending/all/day?language=en-US&page=${page}`;
+        const result = await this.getResource(url);
+        return result;
     }
 
-    async getMoviesBySearch(query) {
+    async getMoviesBySearch(query, page = 1) {
         if (!query) {
-            return this.getTrendingMovies();
+            return this.getTrendingMovies(page);
         }
-        const url = `${this.apiUrl}/search/movie?language=en-US&query=${encodeURIComponent(query)}`;
+        const url = `${this.apiUrl}/search/movie?language=en-US&query=${encodeURIComponent(query)}&page=${page}`;
         const res = await this.getResource(url);
-        return res.results;
+        return res;
     }
 }
