@@ -3,7 +3,7 @@ import "./movie-search.scss"
 export default class MovieSearch extends Component {
     handleInputChange = (event) => {
         const searchText = event.target.value;
-        this.props.onSearch(searchText);
+        this.props.onSearch(searchText, 1);
     };
 
     handleSubmit = (event) => {

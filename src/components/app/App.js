@@ -17,6 +17,7 @@ export default class App extends Component {
         isOnline: window.navigator.onLine,
         currentPage: 1,
         totalResults: 0,
+        searchQuery: ''
     };
 
     componentDidMount() {
@@ -36,7 +37,7 @@ export default class App extends Component {
 
     handleSearch = debounce(async (text, currentPage) => {
         try {
-            this.setState({ loading: true });
+            this.setState({ loading: true, searchQuery: text });
             const response = await this.mdbapiService.getMoviesBySearch(text, currentPage);
             this.setState({ movies: response.results, totalResults: response.total_results, loading: false, error: false });
         } catch (error) {
@@ -45,9 +46,11 @@ export default class App extends Component {
         }
     }, 800);
 
+    javascript
+
     handlePageChange = (page) => {
         this.setState({ currentPage: page });
-        this.handleSearch('', page);
+        this.handleSearch(this.state.searchQuery, page);
     };
     render() {
         const { isOnline, movies, loading, error } = this.state;
