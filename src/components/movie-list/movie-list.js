@@ -1,43 +1,31 @@
-import MovieCard from "../movie-card/movie-list-item";
-import "./movie-list.css"
-import {Component} from "react";
-import MdbapiService from "../services/service-api";
-export default class movieList extends Component{
-    mdbapiService = new MdbapiService();
-    state = {
-        movies: [],
-    }
+import MovieCard from "../movie-list-item/movie-list-item";
+import "./movie-list.scss";
+import { Component } from "react";
+import ErrorIndicator from "../error-indication/error-indicator";
 
-    componentDidMount() {
-        this.updateData();
-    }
-
-    updateData() {
-        this.mdbapiService.getResults().then((data) => {
-            this.setState({
-                movies: data,
-            });
-        });
-    }
+export default class movieList extends Component {
     render() {
-        const { movies } = this.state;
+        const { movies, error } = this.props;
+
+        const errorMessage = error ? <ErrorIndicator /> : null;
 
         return (
             <div>
+                {errorMessage}
                 <div className="movie-list">
-                {movies.map((movies) => (
+                    {movies.map((movie) => (
                         <MovieCard
-                            title={movies.title}
-                            name={movies.name}
-                            release_date={movies.release_date}
-                            first_air_date={movies.first_air_date}
-                            genre_ids={movies.genre_ids}
-                            overview={movies.overview}
-                            id={movies.id}
-                            poster_path={movies.poster_path}
+                            key={movie.id}
+                            title={movie.title}
+                            name={movie.name}
+                            release_date={movie.release_date}
+                            first_air_date={movie.first_air_date}
+                            genre_ids={movie.genre_ids}
+                            overview={movie.overview}
+                            id={movie.id}
+                            poster_path={movie.poster_path}
                         />
-
-                ))}
+                    ))}
                 </div>
             </div>
         );
