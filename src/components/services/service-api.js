@@ -18,10 +18,28 @@ export default class MdbapiService {
         return await res.json();
     }
 
+    async getGuestSession() {
+        const url = `${this.apiUrl}/authentication/guest_session/new`;
+        const res = await this.getResource(url);
+        return res;
+    }
+
+
     async getTrendingMovies(page = 1) {
         const url = `${this.apiUrl}/trending/all/day?language=en-US&page=${page}`;
         const result = await this.getResource(url);
         return result;
+    }
+
+    async getRatedMovies() {
+        const url = `${this.apiUrl}/guest_session/2002/rated/movies`;
+        try {
+            const res = await this.getResource(url);
+            return res;
+        } catch (error) {
+            console.error('Error getting rated movies:', error);
+            return [];
+        }
     }
 
     async getMoviesBySearch(query, page = 1) {

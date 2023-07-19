@@ -1,11 +1,11 @@
-import MovieCard from "../movie-list-item/movie-list-item";
 import "./movie-list.scss";
 import { Component } from "react";
 import ErrorIndicator from "../error-indication/error-indicator";
+import MovieListItem from "../movie-list-item/movie-list-item";
 
 export default class movieList extends Component {
     render() {
-        const { movies, error } = this.props;
+        const { movies, error, userRatings, onRateChange } = this.props;
 
         const errorMessage = error ? <ErrorIndicator /> : null;
 
@@ -14,7 +14,7 @@ export default class movieList extends Component {
                 {errorMessage}
                 <div className="movie-list">
                     {movies.map((movie) => (
-                        <MovieCard
+                        <MovieListItem
                             key={movie.id}
                             title={movie.title}
                             name={movie.name}
@@ -24,6 +24,9 @@ export default class movieList extends Component {
                             overview={movie.overview}
                             id={movie.id}
                             poster_path={movie.poster_path}
+                            onRateChange={onRateChange}
+                            userRatings={userRatings[movie.id]}
+                            rating={movie.vote_average}
                         />
                     ))}
                 </div>

@@ -2,7 +2,11 @@
     margin-left: 215px;
     margin-right: 215px;
     font-family: 'Inter', sans-serif;
-
+    @media (max-width: 420px){
+        max-width: 420px;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 .error-message {
     font-size: 25px;
@@ -26,4 +30,10 @@
     align-items: center;
     border: 1px solid red;
     height: 50px;
+}
+.header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 13px;
 }
