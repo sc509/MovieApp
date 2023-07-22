@@ -3,39 +3,21 @@ import { format, parseISO } from 'date-fns';
 import { Rate } from 'antd';
 import PropTypes from 'prop-types';
 
+import truncateString from '../../Utilities/truncate-string';
 import { GenresConsumer } from '../genres-context/genres-context';
 
 import './movie-list-item.scss';
 
-function truncateString(str, num) {
-  if (str.length <= num) {
-    return str;
-  }
-  const subString = str.substr(0, num);
-  const lastSpaceIndex = subString.lastIndexOf(' ');
-
-  if (lastSpaceIndex > 0) {
-    return `${subString.substr(0, lastSpaceIndex)}...`;
-  }
-  return `${subString}...`;
-}
-
-/* eslint-disable class-methods-use-this */
 export default class MovieListItem extends Component {
   handleImageError = (event) => {
-    // eslint-disable-next-line no-param-reassign
     event.target.onerror = null;
-    // eslint-disable-next-line no-param-reassign
     event.target.src = 'https://skomarket.ru/upload/iblock/349/fzk93483k2g5hmxa3mho61h94vlpxklq.jpg';
   };
-  /* eslint-enable class-methods-use-this */
 
-  /* eslint-disable class-methods-use-this */
   handleRateChange = (value) => {
     const { id, onRateChange } = this.props;
     onRateChange(id, value);
   };
-  /* eslint-enable class-methods-use-this */
 
   render() {
     const {
@@ -76,7 +58,7 @@ export default class MovieListItem extends Component {
               />
             </div>
             <div className="movie-list__item-content">
-              <h1 className="movie-list__item-title">{title || name}</h1>
+              <h1 className="movie-list__item-title">{truncateString(title || name, 30)}</h1>
               <div className={`movie-list__item-rate ${ratingClass}`}>{Math.round(rating)}</div>
               <p className="movie-list__item-date">{formattedDate}</p>
               <div className="movie-list__item-genres">
@@ -88,7 +70,7 @@ export default class MovieListItem extends Component {
               </div>
               <p className="movie-list__item-description">{truncateString(overview, 170)}</p>
               <div className="movie-list__item-user-rate">
-                <Rate value={userRatings} onChange={this.handleRateChange} />
+                <Rate className="rateStyle" value={userRatings} count={10} onChange={this.handleRateChange} />
               </div>
             </div>
           </div>

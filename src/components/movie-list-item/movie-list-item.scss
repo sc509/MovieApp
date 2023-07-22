@@ -36,7 +36,7 @@ $description-color:rgba(0, 0, 0, 1);
         margin-bottom: 7px;
         line-height: 28px;
         font-size: 20px;
-        width: 190px;
+        width: 220px;
         @media (max-width: 420px){
             margin-top: 4px;
 
@@ -124,4 +124,6 @@ $description-color:rgba(0, 0, 0, 1);
 .rating-very-low{
     border: 2px solid #E90000;
 }
-
+.rateStyle {
+    font-size: 17px;
+}

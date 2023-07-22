@@ -1,39 +1,62 @@
 import React, { Component } from 'react';
 
+import MdbapiService from '../../services/service-api';
+
 const GenresContext = React.createContext();
 
 export class GenresProvider extends Component {
-  /* eslint-disable react/no-unused-state */ state = {
+  mdbapiService = new MdbapiService();
+
+  state = {
     genres: {},
+    error: null,
+    value: null,
   };
-  /* eslint-enable react/no-unused-state */
 
   componentDidMount() {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNGViNzdmNTAwY2ZlMGM3YjNjOTZiOTc1NjliNjYyOSIsInN1YiI6IjY0YTY3OTFjY2FlNjMyMDBjODdkOWRhMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.mn79LJYRe_MiBuwRyQQftEw3D-hnE1ELZQ_7MVX3BnQ',
-      },
-    };
-    /* eslint-disable react/no-unused-state */
-    fetch('https://api.themoviedb.org/3/genre/movie/list', options)
-      .then((response) => response.json())
-      .then((response) => {
-        const genres = {};
-        response.genres.forEach((genre) => {
-          genres[genre.id] = genre.name;
-        });
-        this.setState({ genres });
-      })
-      .catch((err) => console.error(err));
+    this.fetchGenres();
   }
-  /* eslint-disable react/no-unused-state */
+
+  componentDidUpdate(prevProps, prevState) {
+    const { genres, error } = this.state;
+
+    if (genres !== prevState.genres || error !== prevState.error) {
+      this.setState({
+        value: {
+          genres,
+          error,
+        },
+      });
+    }
+  }
+
+  fetchGenres = () => {
+    this.mdbapiService
+      .getGenres()
+      .then((genres) => {
+        const genresMap = {};
+        genres.forEach((genre) => {
+          genresMap[genre.id] = genre.name;
+        });
+        this.setState({
+          genres: genresMap,
+          error: null,
+        });
+      })
+      .catch((error) => {
+        this.setState({ error: error.message });
+      });
+  };
 
   render() {
     const { children } = this.props;
-    return <GenresContext.Provider value={this.state}>{children}</GenresContext.Provider>;
+    const { error, value } = this.state;
+    return (
+      <GenresContext.Provider value={value}>
+        {children}
+        {error && <div>{`Ошибка: ${error}`}</div>}
+      </GenresContext.Provider>
+    );
   }
 }
 

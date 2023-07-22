@@ -26,6 +26,8 @@
   },
   "plugins": ["react", "prettier","import","jsx-a11y","react-hooks"],
   "rules": {
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off",
     "no-plusplus": "off",
     "indent": "off",
     "prettier/prettier": "error",

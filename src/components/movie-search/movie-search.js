@@ -9,11 +9,9 @@ export default class MovieSearch extends Component {
     onSearch(searchText, 1);
   };
 
-  /* eslint-disable class-methods-use-this */
   handleSubmit = (event) => {
     event.preventDefault();
   };
-  /* eslint-enable class-methods-use-this */
 
   render() {
     return (
