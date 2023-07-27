@@ -42,7 +42,13 @@ export default class MdbapiService {
     try {
       const res = await fetch(url, this.options);
       if (!res.ok) {
-        throw new Error(`Could not fetch ${url}, received ${res.status}`);
+        if (res.status === 0) {
+          throw new Error(
+            'Network response was not ok. This could be due to a network error or the server being unavailable.'
+          );
+        } else {
+          throw new Error(`Could not fetch ${url}, received ${res.status}`);
+        }
       }
       return await res.json();
     } catch (error) {
@@ -85,7 +91,11 @@ export default class MdbapiService {
       const result = await this.getResource(url.toString());
       return result.genres;
     } catch (error) {
-      throw new Error(`Error getting genres: ${error.message}`);
+      if (error.message === 'Failed to fetch') {
+        throw new Error(`Network error: ${error.message}`);
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -109,7 +119,7 @@ export default class MdbapiService {
   }
 
   async rateMovie(movieId, rating, sessionId) {
-    const url = new URL(`${this.apiUrl}/movie/${movieId}/rating`);
+    const url = new URL(`${this.apiUrl}/movie/${movieId}/rating?guest_session_id=${sessionId}`);
     url.search = new URLSearchParams({
       guest_session_id: sessionId,
     }).toString();
@@ -128,7 +138,39 @@ export default class MdbapiService {
       }
       return await res.json();
     } catch (error) {
-      throw new Error(`Error posting rating for movie ${movieId}: ${error.message}`);
+      if (error.name === 'AbortError') {
+        throw new Error('Fetch aborted');
+      }
+      if (error.message === 'Failed to fetch') {
+        throw new Error('Network error. Please try again later.');
+      }
+      throw new Error(`Error getting rated movies: ${error.message}`);
+    }
+  }
+
+  async getRateMovies(sessionId) {
+    const url = new URL(`${this.apiUrl}/guest_session/${sessionId}/rated/movies`);
+    url.search = new URLSearchParams({
+      api_key: this.apiKey,
+    }).toString();
+
+    try {
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          ...this.options.headers,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Could not get rated movies: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Data:', data);
+      return data.results;
+    } catch (error) {
+      throw new Error(`Error getting rated movies: ${error.message}`);
     }
   }
 

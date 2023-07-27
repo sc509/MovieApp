@@ -35,22 +35,17 @@ export default class App extends Component {
     window.addEventListener('online', this.updateOnlineStatus);
     window.addEventListener('offline', this.updateOnlineStatus);
 
-    const mdbapiService = new MdbapiService();
-    mdbapiService.createGuestSession().then((newSession) => {
-      this.setState({ session: newSession });
+    this.mdbapiService.createGuestSession().then((newSession) => {
+      this.setState(
+        {
+          session: newSession,
+        },
+        () => {
+          this.getRatedMovies();
+          this.getRatingMovies();
+        }
+      );
     });
-
-    const sessionUserRatings = sessionStorage.getItem('userRatings');
-    if (sessionUserRatings) {
-      this.setState({ userRatings: JSON.parse(sessionUserRatings) });
-    }
-
-    const sessionArrayRating = sessionStorage.getItem('arrayRating');
-    if (sessionArrayRating) {
-      this.setState({ arrayRating: JSON.parse(sessionArrayRating) });
-    }
-
-    this.getRatedMovies();
   }
 
   componentWillUnmount() {
@@ -67,6 +62,25 @@ export default class App extends Component {
       this.setState({ error: true, loading: false });
     }
   }, 800);
+
+  getRatingMovies = async () => {
+    const { session } = this.state;
+
+    try {
+      const rest = await this.mdbapiService.getRateMovies(session);
+      console.log('Data from API:', rest);
+      if (rest && rest.results) {
+        this.setState({
+          arrayRating: rest.results,
+          userRatings: rest.results.reduce((accumulator, movie) => ({ ...accumulator, [movie.id]: movie.rating }), {}),
+        });
+      } else {
+        console.error('Не получили данные от API');
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении запроса: ', error);
+    }
+  };
 
   getRatedMovies = async () => {
     const res = await this.mdbapiService.getRatedMovies();
@@ -93,7 +107,6 @@ export default class App extends Component {
     this.setState(
       (prevState) => {
         const newUserRatings = { ...prevState.userRatings, [id]: value };
-        sessionStorage.setItem('userRatings', JSON.stringify(newUserRatings));
 
         let newArrayRating;
         if (value) {
@@ -103,16 +116,17 @@ export default class App extends Component {
           newArrayRating = prevState.arrayRating.filter((movie) => movie.id !== id);
         }
 
-        sessionStorage.setItem('arrayRating', JSON.stringify(newArrayRating));
-
         return { userRatings: newUserRatings, arrayRating: newArrayRating };
       },
-      () => {
+      async () => {
         const { session } = this.state;
         if (value) {
-          this.mdbapiService.rateMovie(id, value, session);
+          const answerServer = await this.mdbapiService.rateMovie(id, value, session);
+          console.log(answerServer);
+          await this.getRatingMovies();
         } else {
-          this.mdbapiService.deleteRating(id, session);
+          await this.mdbapiService.deleteRating(id, session);
+          await this.getRatingMovies();
         }
       }
     );
@@ -151,6 +165,7 @@ export default class App extends Component {
       currentPageRated,
       totalResults,
       arrayRating,
+      session,
     } = this.state;
     const startIndex = (activeTab === 'rated' ? currentPageRated - 1 : currentPage - 1) * 20;
     const endIndex = startIndex + 20;
@@ -162,7 +177,7 @@ export default class App extends Component {
     ) : null;
     const noResultsMessage =
       !loading && !error && movies.length === 0 ? <div className="no-results-message">Ничего не найдено</div> : null;
-
+    console.log(session);
     return (
       <div>
         {isOnline ? (
